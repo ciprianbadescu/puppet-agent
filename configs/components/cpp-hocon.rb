@@ -4,7 +4,7 @@ component "cpp-hocon" do |pkg, settings, platform|
   pkg.build_requires('leatherman')
 
   make = platform[:make]
-  boost_static_flag = "-DBOOST_STATIC=ON"
+  boost_static_flag = ""
 
   # cmake on OSX is provided by brew
   # a toolchain is not currently required for OSX since we're building with clang.
@@ -24,19 +24,18 @@ component "cpp-hocon" do |pkg, settings, platform|
     special_flags = "-DCMAKE_CXX_FLAGS_RELEASE='-O2 -DNDEBUG'"
   elsif platform.is_windows?
     make = "#{settings[:gcc_bindir]}/mingw32-make"
-    pkg.environment "PATH", "$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
+    pkg.environment "PATH", "$(shell cygpath -u #{settings[:prefix]}/lib):$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
     pkg.environment "CYGWIN", settings[:cygwin]
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-  elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
+  elsif platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
     # These platforms use the default OS toolchain, rather than pl-build-tools
-    pkg.environment "CPPFLAGS", settings[:cppflags]
-    pkg.environment "LDFLAGS", settings[:ldflags]
     cmake = "cmake"
     toolchain = ""
     boost_static_flag = "-DBOOST_STATIC=OFF"
-    special_flags = " -DENABLE_CXX_WERROR=OFF -DCMAKE_CXX_FLAGS='#{settings[:cflags]}'"
+    special_flags = "-DCMAKE_CXX_FLAGS='-Wno-error=address -Wno-error=nonnull-compare'" if platform.name =~ /fedora-29|debian-10/
+    special_flags = " -DENABLE_CXX_WERROR=OFF " if platform.name =~ /el-8|fedora-(29|30)|debian-10/
   else
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
     cmake = "/opt/pl-build-tools/bin/cmake"

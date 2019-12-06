@@ -1,6 +1,7 @@
 component "cpp-pcp-client" do |pkg, settings, platform|
   pkg.load_from_json('configs/components/cpp-pcp-client.json')
 
+  boost_static_flag = ""
   cmake = "/opt/pl-build-tools/bin/cmake"
   toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
   make = platform[:make]
@@ -18,12 +19,9 @@ component "cpp-pcp-client" do |pkg, settings, platform|
   end
   pkg.build_requires "leatherman"
 
-  boost_static_flag = "-DBOOST_STATIC=ON"
-
   if platform.is_aix?
     pkg.build_requires "http://pl-build-tools.delivery.puppetlabs.net/aix/#{platform.os_version}/ppc/pl-gcc-5.2.0-11.aix#{platform.os_version}.ppc.rpm"
     pkg.build_requires "http://pl-build-tools.delivery.puppetlabs.net/aix/#{platform.os_version}/ppc/pl-cmake-3.2.3-2.aix#{platform.os_version}.ppc.rpm"
-    pkg.build_requires "http://pl-build-tools.delivery.puppetlabs.net/aix/#{platform.os_version}/ppc/pl-yaml-cpp-0.5.1-1.aix#{platform.os_version}.ppc.rpm"
     # This should be moved to the toolchain file
     platform_flags = '-DCMAKE_SHARED_LINKER_FLAGS="-Wl,-bbigtoc"'
   elsif platform.is_macos?
@@ -43,15 +41,12 @@ component "cpp-pcp-client" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-  elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
+  elsif platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
     # These platforms use the default OS toolchain, rather than pl-build-tools
-    pkg.environment "CPPFLAGS", settings[:cppflags]
-    pkg.environment "LDFLAGS", settings[:ldflags]
     cmake = "cmake"
     toolchain = ""
-    boost_static_flag = "-DBOOST_STATIC=OFF"
     platform_flags = "-DCMAKE_CXX_FLAGS='#{settings[:cflags]} -Wimplicit-fallthrough=0'"
-    special_flags = " -DENABLE_CXX_WERROR=OFF"
+    special_flags = " -DENABLE_CXX_WERROR=OFF " if platform.name =~ /el-8|fedora-(29|30)|debian-10/
   elsif platform.is_cisco_wrlinux?
     platform_flags = "-DLEATHERMAN_USE_LOCALES=OFF"
   end
@@ -67,8 +62,8 @@ component "cpp-pcp-client" do |pkg, settings, platform|
           -DCMAKE_INSTALL_PREFIX=#{settings[:prefix]} \
           -DCMAKE_INSTALL_RPATH=#{settings[:libdir]} \
           -DCMAKE_SYSTEM_PREFIX_PATH=#{settings[:prefix]} \
-          #{boost_static_flag} \
           #{special_flags} \
+          #{boost_static_flag} \
           ."
     ]
   end
