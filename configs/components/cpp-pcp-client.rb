@@ -64,8 +64,8 @@ component "cpp-pcp-client" do |pkg, settings, platform|
           -DCMAKE_INSTALL_PREFIX=#{settings[:prefix]} \
           -DCMAKE_INSTALL_RPATH=#{settings[:libdir]} \
           -DCMAKE_SYSTEM_PREFIX_PATH=#{settings[:prefix]} \
-          #{special_flags} \
           #{boost_static_flag} \
+          #{special_flags} \
           ."
     ]
   end
