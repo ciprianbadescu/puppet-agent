@@ -41,12 +41,14 @@ component "cpp-pcp-client" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-  elsif platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
+  elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     # These platforms use the default OS toolchain, rather than pl-build-tools
+    pkg.environment "CPPFLAGS", settings[:cppflags]
+    pkg.environment "LDFLAGS", settings[:ldflags]
     cmake = "cmake"
     toolchain = ""
     platform_flags = "-DCMAKE_CXX_FLAGS='#{settings[:cflags]} -Wimplicit-fallthrough=0'"
-    special_flags = " -DENABLE_CXX_WERROR=OFF " if platform.name =~ /el-8|fedora-(29|30)|debian-10/
+    special_flags = " -DENABLE_CXX_WERROR=OFF"
   elsif platform.is_cisco_wrlinux?
     platform_flags = "-DLEATHERMAN_USE_LOCALES=OFF"
   end

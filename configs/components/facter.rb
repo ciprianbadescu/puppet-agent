@@ -20,7 +20,7 @@ component "facter" do |pkg, settings, platform|
 
   pkg.build_requires 'puppet-runtime' # Provides augeas, boost, curl, openssl, ruby, yaml-cpp
   pkg.build_requires 'leatherman'
-  pkg.build_requires 'runtime' unless platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
+  pkg.build_requires 'runtime' unless platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
   pkg.build_requires 'cpp-hocon'
   pkg.build_requires 'libwhereami'
 
@@ -42,7 +42,7 @@ component "facter" do |pkg, settings, platform|
   case platform.name
   when /el-(6|7|8)|redhatfips-7/
     pkg.build_requires 'java-1.8.0-openjdk-devel'
-  when /debian-8/
+  when /(debian-8|ubuntu-14)/
     pkg.build_requires 'openjdk-7-jdk'
     java_home = "/usr/lib/jvm/java-7-openjdk-#{platform.architecture}"
   when /(debian-9|ubuntu-(15|16|18))/
@@ -134,13 +134,15 @@ component "facter" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-  elsif platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
+  elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     # These platforms use the default OS toolchain, rather than pl-build-tools
+    pkg.environment "CPPFLAGS", settings[:cppflags]
+    pkg.environment "LDFLAGS", settings[:ldflags]
     cmake = "cmake"
     toolchain = ""
     boost_static_flag = "-DBOOST_STATIC=OFF"
     yamlcpp_static_flag = "-DYAMLCPP_STATIC=OFF"
-    special_flags += " -DENABLE_CXX_WERROR=OFF " if platform.name =~ /el-8|fedora-(29|30)|debian-10/
+    special_flags += " -DENABLE_CXX_WERROR=OFF -DCMAKE_CXX_FLAGS='#{settings[:cflags]}'"
   else
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
     cmake = "/opt/pl-build-tools/bin/cmake"
@@ -213,7 +215,7 @@ component "facter" do |pkg, settings, platform|
   end
 
   # Disable tests for platforms that use the default OS toolchain
-  unless platform.name =~ /sles-15|fedora-(29|30)|el-8|debian-10/
+  unless platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     pkg.check do
       tests
     end
