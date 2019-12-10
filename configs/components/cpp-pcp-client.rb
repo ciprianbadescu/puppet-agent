@@ -1,7 +1,6 @@
 component "cpp-pcp-client" do |pkg, settings, platform|
   pkg.load_from_json('configs/components/cpp-pcp-client.json')
 
-  boost_static_flag = ""
   cmake = "/opt/pl-build-tools/bin/cmake"
   toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
   make = platform[:make]
@@ -18,6 +17,8 @@ component "cpp-pcp-client" do |pkg, settings, platform|
     pkg.build_requires "puppet-runtime" # Provides openssl
   end
   pkg.build_requires "leatherman"
+
+  boost_static_flag = ""
 
   if platform.is_aix?
     pkg.build_requires "http://pl-build-tools.delivery.puppetlabs.net/aix/#{platform.os_version}/ppc/pl-gcc-5.2.0-11.aix#{platform.os_version}.ppc.rpm"
@@ -41,7 +42,6 @@ component "cpp-pcp-client" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-    boost_static_flag = "-DBOOST_STATIC=ON"
   elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     # These platforms use the default OS toolchain, rather than pl-build-tools
     pkg.environment "CPPFLAGS", settings[:cppflags]

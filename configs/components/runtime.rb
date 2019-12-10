@@ -71,7 +71,7 @@ component "runtime" do |pkg, settings, platform|
     # Copy the boost dlls into the bindir
     settings[:boost_libs].each do |name|
       pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
-      pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll.a", "#{settings[:libdir]}/libboost_#{name}.dll.a"
+      pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
     end
   else # Linux and Solaris systems
     pkg.install do

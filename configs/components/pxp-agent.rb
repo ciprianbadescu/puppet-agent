@@ -3,7 +3,6 @@ component "pxp-agent" do |pkg, settings, platform|
 
   toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
   cmake = "/opt/pl-build-tools/bin/cmake"
-  boost_static_flag = ""
 
   if platform.is_windows?
     pkg.environment "PATH", "$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:ruby_bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
@@ -54,7 +53,6 @@ component "pxp-agent" do |pkg, settings, platform|
     special_flags = " -DCMAKE_INSTALL_PREFIX=#{settings[:pxp_root]} "
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-    boost_static_flag = "-DBOOST_STATIC=ON"
   elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     # These platforms use the default OS toolchain, rather than pl-build-tools
     cmake = "cmake"
@@ -121,8 +119,8 @@ component "pxp-agent" do |pkg, settings, platform|
         "leatherman_util.dll",
         "leatherman_windows.dll",
         "libcpp-pcp-client.dll",
-        "libcrypto-1_1-x64.dll",
-        "libssl-1_1-x64.dll",
+        platform.architecture == "x64" ? "libcrypto-1_1-x64.dll" : "libcrypto-1_1.dll",
+        platform.architecture == "x64" ? "libssl-1_1-x64.dll" : "libssl-1_1.dll",
         platform.architecture == "x64" ? "libgcc_s_seh-1.dll" : "libgcc_s_sjlj-1.dll",
         "libstdc++-6.dll"
       ]

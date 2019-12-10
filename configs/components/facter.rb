@@ -134,9 +134,6 @@ component "facter" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
-    boost_static_flag = "-DBOOST_STATIC=ON"
-    yamlcpp_static_flag = "-DYAMLCPP_STATIC=ON"
-
     special_flags = "-DCMAKE_INSTALL_PREFIX=#{settings[:facter_root]} \
                      -DRUBY_LIB_INSTALL=#{settings[:facter_root]}/lib "
   elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
@@ -240,9 +237,9 @@ component "facter" do |pkg, settings, platform|
     # in the runtime component
     pkg.install_file "#{settings[:tools_root]}/bin/zlib1.dll", "#{settings[:facter_root]}/bin/zlib1.dll"
     [
-      "libcrypto-1_1-x64.dll",
+      platform.architecture == "x64" ? "libcrypto-1_1-x64.dll" : "libcrypto-1_1.dll",
       platform.architecture == "x64" ? "libgcc_s_seh-1.dll" : "libgcc_s_sjlj-1.dll",
-      "libssl-1_1-x64.dll"
+      platform.architecture == "x64" ? "libssl-1_1-x64.dll" : "libssl-1_1.dll",
     ].each do |dll|
       pkg.install_file "#{settings[:prefix]}/bin/#{dll}", "#{settings[:facter_root]}/bin/#{dll}"
     end
