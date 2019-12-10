@@ -59,11 +59,12 @@ component "leatherman" do |pkg, settings, platform|
     special_flags += "-DCMAKE_CXX_FLAGS_RELEASE='-O2 -DNDEBUG'"
   elsif platform.is_windows?
     make = "#{settings[:gcc_bindir]}/mingw32-make"
-    pkg.environment "PATH", "$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:ruby_bindir]}):$(shell cygpath -u #{settings[:bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
+    pkg.environment "PATH", "$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:ruby_bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
     pkg.environment "CYGWIN", settings[:cygwin]
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
+    boost_static_flag = "-DBOOST_STATIC=ON"
 
     # Use environment variable set in environment.bat to find locale files
     leatherman_locale_var = "-DLEATHERMAN_LOCALE_VAR='PUPPET_DIR' -DLEATHERMAN_LOCALE_INSTALL='share/locale'"
@@ -73,7 +74,7 @@ component "leatherman" do |pkg, settings, platform|
     pkg.environment "LDFLAGS", settings[:ldflags]
     cmake = "cmake"
     toolchain = ""
-    boost_static_flag = ""
+    boost_static_flag = "-DBOOST_STATIC=OFF"
 
     # Workaround for hanging leatherman tests (-fno-strict-overflow)
     special_flags = " -DENABLE_CXX_WERROR=OFF -DCMAKE_CXX_FLAGS='#{settings[:cflags]} -fno-strict-overflow' "

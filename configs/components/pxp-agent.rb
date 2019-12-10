@@ -23,6 +23,7 @@ component "pxp-agent" do |pkg, settings, platform|
 
   make = platform[:make]
 
+  boost_static_flag = ""
   special_flags = " -DCMAKE_INSTALL_PREFIX=#{settings[:prefix]} "
 
   if platform.is_aix?
@@ -53,10 +54,12 @@ component "pxp-agent" do |pkg, settings, platform|
     special_flags = " -DCMAKE_INSTALL_PREFIX=#{settings[:pxp_root]} "
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
+    boost_static_flag = "-DBOOST_STATIC=ON"
   elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
     # These platforms use the default OS toolchain, rather than pl-build-tools
     cmake = "cmake"
     toolchain = ""
+    boost_static_flag = "-DBOOST_STATIC=OFF"
     special_flags += " -DCMAKE_CXX_FLAGS='#{settings[:cflags]} -Wno-deprecated -Wimplicit-fallthrough=0' "
     special_flags += " -DENABLE_CXX_WERROR=OFF " if platform.name =~ /el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
   elsif platform.is_cisco_wrlinux?

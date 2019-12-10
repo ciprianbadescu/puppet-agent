@@ -134,6 +134,9 @@ component "facter" do |pkg, settings, platform|
 
     cmake = "C:/ProgramData/chocolatey/bin/cmake.exe -G \"MinGW Makefiles\""
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=#{settings[:tools_root]}/pl-build-toolchain.cmake"
+    boost_static_flag = "-DBOOST_STATIC=ON"
+    yamlcpp_static_flag = "-DYAMLCPP_STATIC=ON"
+
     special_flags = "-DCMAKE_INSTALL_PREFIX=#{settings[:facter_root]} \
                      -DRUBY_LIB_INSTALL=#{settings[:facter_root]}/lib "
   elsif platform.name =~ /sles-15|el-8|debian-10/ || (platform.is_fedora? && platform.os_version.to_i >= 29)
@@ -147,6 +150,7 @@ component "facter" do |pkg, settings, platform|
     special_flags += " -DENABLE_CXX_WERROR=OFF -DCMAKE_CXX_FLAGS='#{settings[:cflags]}'"
   else
     toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
+    cmake = "/opt/pl-build-tools/bin/cmake"
 
     if platform.is_cisco_wrlinux?
       special_flags += " -DLEATHERMAN_USE_LOCALES=OFF"
@@ -227,6 +231,7 @@ component "facter" do |pkg, settings, platform|
     pkg.add_source("file://resources/files/windows/facter.bat", sum: "185b8645feecac4acadc55c64abb3755")
     pkg.add_source("file://resources/files/windows/facter_interactive.bat", sum: "20a1c0bc5368ffb24980f42432f1b372")
     pkg.add_source("file://resources/files/windows/run_facter_interactive.bat", sum: "c5e0c0a80e5c400a680a06a4bac8abd4")
+
     pkg.install_file "../facter.bat", "#{settings[:link_bindir]}/facter.bat"
     pkg.install_file "../facter_interactive.bat", "#{settings[:link_bindir]}/facter_interactive.bat"
     pkg.install_file "../run_facter_interactive.bat", "#{settings[:link_bindir]}/run_facter_interactive.bat"

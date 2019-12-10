@@ -53,7 +53,6 @@ component "runtime" do |pkg, settings, platform|
     pkg.install_file "#{settings[:gcc_bindir]}/libgcc_s_#{lib_type}-1.dll", "#{settings[:bindir]}/libgcc_s_#{lib_type}-1.dll"
     pkg.install_file "#{settings[:gcc_bindir]}/libstdc++-6.dll", "#{settings[:bindir]}/libstdc++-6.dll"
     pkg.install_file "#{settings[:gcc_bindir]}/libwinpthread-1.dll", "#{settings[:bindir]}/libwinpthread-1.dll"
-
     pkg.install_file "#{settings[:gcc_bindir]}/libgcc_s_#{lib_type}-1.dll", "#{settings[:facter_root]}/lib/libgcc_s_#{lib_type}-1.dll"
     pkg.install_file "#{settings[:gcc_bindir]}/libstdc++-6.dll", "#{settings[:facter_root]}/lib/libstdc++-6.dll"
     pkg.install_file "#{settings[:gcc_bindir]}/libwinpthread-1.dll", "#{settings[:facter_root]}/lib/libwinpthread-1.dll"
@@ -62,7 +61,7 @@ component "runtime" do |pkg, settings, platform|
     # update curl to statically link against zlib
     pkg.install_file "#{settings[:tools_root]}/bin/zlib1.dll", "#{settings[:ruby_bindir]}/zlib1.dll"
 
-    # gdbm and iconv are runtime dependancies of ruby, and their libraries need
+    # gdbm, yaml-cpp and iconv are all runtime dependancies of ruby, and their libraries need
     # To exist inside our vendored ruby
     pkg.install_file "#{settings[:tools_root]}/bin/libgdbm-4.dll", "#{settings[:ruby_bindir]}/libgdbm-4.dll"
     pkg.install_file "#{settings[:tools_root]}/bin/libgdbm_compat-4.dll", "#{settings[:ruby_bindir]}/libgdbm_compat-4.dll"
