@@ -4,7 +4,7 @@ component "libwhereami" do |pkg, settings, platform|
   pkg.build_requires('leatherman')
 
   make = platform[:make]
-  boost_static_flag = ""
+  boost_static_flag = "-DBOOST_STATIC=ON"
 
   # cmake on OSX is provided by brew
   # a toolchain is not currently required for OSX since we're building with clang.

@@ -69,10 +69,10 @@ component "runtime" do |pkg, settings, platform|
     pkg.install_file "#{settings[:tools_root]}/bin/libffi-6.dll", "#{settings[:ruby_bindir]}/libffi-6.dll"
 
     # Copy the boost dlls into the bindir
-    settings[:boost_libs].each do |name|
-      pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
-      pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
-    end
+    # settings[:boost_libs].each do |name|
+    #   pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
+    #   pkg.install_file "#{settings[:prefix]}/lib/libboost_#{name}.dll",   "#{settings[:bindir]}/libboost_#{name}.dll"
+    # end
   else # Linux and Solaris systems
     pkg.install do
       "bash runtime.sh #{libdir}"

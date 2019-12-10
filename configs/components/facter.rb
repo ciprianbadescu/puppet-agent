@@ -102,8 +102,8 @@ component "facter" do |pkg, settings, platform|
   cp = platform[:cp]
 
   special_flags = " -DCMAKE_INSTALL_PREFIX=#{settings[:prefix]} "
-  boost_static_flag = ""
-  yamlcpp_static_flag = ""
+  boost_static_flag = "-DBOOST_STATIC=ON"
+  yamlcpp_static_flag = "-DYAMLCPP_STATIC=ON"
 
   # cmake on OSX is provided by brew
   # a toolchain is not currently required for OSX since we're building with clang.

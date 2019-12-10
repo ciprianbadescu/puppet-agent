@@ -22,7 +22,7 @@ component "pxp-agent" do |pkg, settings, platform|
 
   make = platform[:make]
 
-  boost_static_flag = ""
+  boost_static_flag = "-DBOOST_STATIC=ON"
   special_flags = " -DCMAKE_INSTALL_PREFIX=#{settings[:prefix]} "
 
   if platform.is_aix?
