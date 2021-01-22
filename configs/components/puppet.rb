@@ -54,21 +54,19 @@ component "puppet" do |pkg, settings, platform|
       # Note - this definition indicates that the file should be filtered out from the Wix
       # harvest. A corresponding service definition file is also required in resources/windows/wix
       pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\sys\\ruby\\bin\\ruby.exe", init_system: servicetype
+    when "launchd"
+      pkg.install_service "ext/osx/puppet.plist", nil, "com.puppetlabs.puppet"
+    when "smf"
+      pkg.install_service "ext/solaris/smf/puppet.xml", "ext/solaris/smf/puppet", service_type: "network"
+    when "aix"
+      pkg.install_service "resources/aix/puppet.service", nil, "puppet"
+    when "windows"
+      # Note - this definition indicates that the file should be filtered out from the Wix
+      # harvest. A corresponding service definition file is also required in resources/windows/wix
+      pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\puppet\\bin\\ruby.exe"
     else
       fail "need to know where to put service files"
     end
-  when "launchd"
-    pkg.install_service "ext/osx/puppet.plist", nil, "com.puppetlabs.puppet"
-  when "smf"
-    pkg.install_service "ext/solaris/smf/puppet.xml", "ext/solaris/smf/puppet", service_type: "network"
-  when "aix"
-    pkg.install_service "resources/aix/puppet.service", nil, "puppet"
-  when "windows"
-    # Note - this definition indicates that the file should be filtered out from the Wix
-    # harvest. A corresponding service definition file is also required in resources/windows/wix
-    pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\puppet\\bin\\ruby.exe"
-  else
-    fail "need to know where to put service files"
   end
 
   if (platform.get_service_types.include?("sysv") && platform.is_rpm?) || platform.is_aix?

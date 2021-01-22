@@ -118,12 +118,12 @@ component "pxp-agent" do |pkg, settings, platform|
       pkg.install_service "ext/systemd/pxp-agent.service", "ext/redhat/pxp-agent.sysconfig", init_system: servicetype
       pkg.install_configfile "ext/systemd/pxp-agent.logrotate", "/etc/logrotate.d/pxp-agent"
       if platform.is_deb?
-        pkg.add_postinstall_action ["install"], ["if [ -d '/run/systemd/system' ] ; then systemctl disable pxp-agent.service >/dev/null || :; fi"]
+        pkg.add_postinstall_action ["install"], ["if [ -f '/proc/1/comm' ]; then init_comm=`cat /proc/1/comm`;  if [ \"$init_comm\" == \"systemd\" ]; then systemctl disable pxp-agent.service >/dev/null || :; fi; fi"]
       end
     when "sysv"
       if platform.is_deb?
         pkg.install_service "ext/debian/pxp-agent.init", "ext/debian/pxp-agent.default", init_system: servicetype
-        pkg.add_postinstall_action ["install"], ["update-rc.d pxp-agent disable > /dev/null || :"]
+        pkg.add_postinstall_action ["install"], ["if [ -f '/proc/1/comm' ]; then init_comm=`cat /proc/1/comm`;  if [ \"$init_comm\" == \"systemd\" ]; then update-rc.d pxp-agent disable > /dev/null || :; fi; fi"]
       elsif platform.is_sles?
         pkg.install_service "ext/suse/pxp-agent.init", "ext/redhat/pxp-agent.sysconfig", init_system: servicetype
       elsif platform.is_rpm?
@@ -140,22 +140,19 @@ component "pxp-agent" do |pkg, settings, platform|
       # Note - this definition indicates that the file should be filtered out from the Wix
       # harvest. A corresponding service definition file is also required in resources/windows/wix
       pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\service\\nssm.exe", init_system: servicetype
+    when "launchd"
+      pkg.install_service "ext/osx/pxp-agent.plist", nil, "com.puppetlabs.pxp-agent"
+      pkg.install_configfile "ext/osx/pxp-agent.newsyslog.conf", '/etc/newsyslog.d/com.puppetlabs.pxp-agent.conf'
+    when "smf"
+      pkg.install_service "ext/solaris/smf/pxp-agent.xml", service_type: "network"
+    when "aix"
+      pkg.install_service "resources/aix/pxp-agent.service", nil, "pxp-agent"
+    when "windows"
+      # Note - this definition indicates that the file should be filtered out from the Wix
+      # harvest. A corresponding service definition file is also required in resources/windows/wix
+      pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\puppet\\bin\\nssm-pxp-agent.exe"
     else
       fail "need to know where to put #{pkg.get_name} service files"
     end
-    pkg.install_configfile "ext/pxp-agent.logrotate", "/etc/logrotate.d/pxp-agent"
-  when "launchd"
-    pkg.install_service "ext/osx/pxp-agent.plist", nil, "com.puppetlabs.pxp-agent"
-    pkg.install_configfile "ext/osx/pxp-agent.newsyslog.conf", '/etc/newsyslog.d/com.puppetlabs.pxp-agent.conf'
-  when "smf"
-    pkg.install_service "ext/solaris/smf/pxp-agent.xml", service_type: "network"
-  when "aix"
-    pkg.install_service "resources/aix/pxp-agent.service", nil, "pxp-agent"
-  when "windows"
-    # Note - this definition indicates that the file should be filtered out from the Wix
-    # harvest. A corresponding service definition file is also required in resources/windows/wix
-    pkg.install_service "SourceDir\\#{settings[:base_dir]}\\#{settings[:company_id]}\\#{settings[:product_id]}\\puppet\\bin\\nssm-pxp-agent.exe"
-  else
-    fail "need to know where to put #{pkg.get_name} service files"
   end
 end
